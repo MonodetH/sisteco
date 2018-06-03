@@ -2,35 +2,34 @@
 import hashlib
 import time
 import binascii
-import struct
 
 def encrypt(message):
+  # Generar llave
   cryptoKey = generateKey(message)
   key = cryptoKey[:]
 
+  # Pasar mensaje a bytes para trabajar bit-wise
   messageInBytes = bytearray(message)
 
   index = 0
   messageLength = len(messageInBytes)
   while index < messageLength:
+    # Recorre mensaje en bloques dados por la llave
     (blocks, offset) = digestKey(key)
     
-    top = min(index+blocks,len(messageInBytes))
+    top = min(index+blocks,messageLength)
     chunk = messageInBytes[index:top]
-    chunk1 = chunk[:]
+
+    # Aplica xor a cada byte del bloque
     for i, byte in enumerate(chunk):
       chunk[i] = byte^offset
     
-    print 'from',chunk1,'to',chunk
     messageInBytes[index:top] = chunk
 
     index += blocks
-    key = chunk
+    key = chunk # llave basada en el bloque codificado
 
   return (binascii.hexlify(messageInBytes), binascii.hexlify(cryptoKey))
-  #return (messageInBytes, cryptoKey)
-
-
 
 def decrypt(message,key):
   message = bytearray.fromhex(message)
@@ -41,21 +40,22 @@ def decrypt(message,key):
   while index < messageLength:
     (blocks, offset) = digestKey(key)
 
-    top = min(index+blocks,len(message))
+    top = min(index+blocks,messageLength)
     chunk = message[index:top]
-    key = chunk
+    key = chunk[:]
 
     for i, byte in enumerate(chunk):
       chunk[i] = byte^offset
     
-    message[index:index+blocks] = chunk
+    message[index:top] = chunk
 
     index += blocks
 
-  return bytes(message).decode('utf-8')
+  return message
 
 def generateKey(message):
-  #message += str(time.time())
+  # Aplica doble sha para no poder hacer hashing inverso a la llave y obtener el mensaje
+  message += str(time.time())
   sha = hashlib.sha1(message).digest()
   key = bytearray(hashlib.sha1(sha).digest())
   return key
@@ -65,11 +65,12 @@ def digestKey(key):
   if type(key) is not bytearray:
     key = bytearray(key)
   
+  # suma el valor de los bytes y obtiene la cantidad de bloques y offset
   keysum = 0
   for index, value in enumerate(key):
     keysum+= value*(index+1)
 
-  blocks = keysum%8+1
+  blocks = keysum%9+1
   offset = keysum%256
   return (blocks,offset)
 
@@ -79,6 +80,6 @@ message = "Un mensaje medianamente largo para probar que funcione en largos medi
 decoded = decrypt(encoded,key)
 
 print 'mensaje original:', message
-print 'mensaje codificado:', encoded
-print 'llave:',key
-print 'mensaje decodificado:', decoded
+print 'mensaje cifrado:', encoded
+print 'llave:', key
+print 'mensaje decifrado:', decoded
