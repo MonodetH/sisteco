@@ -41,7 +41,8 @@ def decrypt(message,key):
 
   # en caso de llave invalida, destruir mensaje
   if not verifyKey(key):
-    random.shuffle(list(message))
+    message = list(message)
+    message.sort()
     message = bytearray(message)
     
   index = 0
