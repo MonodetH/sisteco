@@ -73,7 +73,7 @@ def digestKey(key):
     keysum+= value*(index+1)
 
   blocks = keysum%9+1
-  offset = keysum%256
+  offset = keysum%251
   return (blocks,offset)
 
 
@@ -87,17 +87,20 @@ print 'llave:', key
 print 'mensaje decifrado:', decoded
 
 
-for n in [10000,15000,20000,25000,100000,1000000,10000000]:
+for kb in [10,15,20,25,100,1000,10000]:
   print '\n'
-  print 'Mensaje',n,'caracteres'
+  n = kb*1024
+  print "Mensaje {0} caracteres ({1} KB)".format(n,kb)
   message = "".join(random.choice(string.lowercase) for i in range(n))
   start = time.time()
   (encoded,key) = encrypt(message)
   end = time.time()
-  print 'codificacion', end-start
+  delta = end-start
+  print "Codificacion {0} KBps ({1} s)".format(kb/delta,delta)
   start = time.time()
   decoded = decrypt(encoded,key)
   end = time.time()
-  print 'decodificacion', end-start
+  delta = end-start
+  print "Decodificacion {0} KBps ({1} s)".format(kb/delta,delta)
 
-  print "original igual a decodificado?", message==decoded
+  print "Original igual a decodificado?", message==decoded
