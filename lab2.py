@@ -89,7 +89,7 @@ print 'llave:', key
 print 'mensaje decifrado:', decoded
 
 
-for kb in [10]:
+for kb in [128,256,512,1024,10240]:
   print '\n'
   n = kb*1024
   print "Mensaje {0} caracteres ({1} KB)".format(n,kb)
