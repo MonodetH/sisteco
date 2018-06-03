@@ -1,4 +1,6 @@
 #!/usr/bin/python2
+# -*- coding: utf-8 -*-
+
 import hashlib
 import time
 import binascii
@@ -77,7 +79,7 @@ def digestKey(key):
   return (blocks,offset)
 
 
-message = "Un mensaje medianamente largo para probar que funcione en largos medianos ja!"
+message = "Un mensaje medianamente (acéñtó) largo para probar que funcione en largos medianos ja!"
 (encoded,key) = encrypt(message)
 decoded = decrypt(encoded,key)
 
@@ -87,7 +89,7 @@ print 'llave:', key
 print 'mensaje decifrado:', decoded
 
 
-for kb in [10,15,20,25,100,1000,10000]:
+for kb in [10]:
   print '\n'
   n = kb*1024
   print "Mensaje {0} caracteres ({1} KB)".format(n,kb)
