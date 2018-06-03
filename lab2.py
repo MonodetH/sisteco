@@ -73,7 +73,7 @@ def digestKey(key):
     keysum+= value*(index+1)
 
   blocks = keysum%9+1
-  offset = keysum%251
+  offset = keysum%251+1
   return (blocks,offset)
 
 
