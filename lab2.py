@@ -2,6 +2,8 @@
 import hashlib
 import time
 import binascii
+import random
+import string
 
 def encrypt(message):
   # Generar llave
@@ -83,3 +85,19 @@ print 'mensaje original:', message
 print 'mensaje cifrado:', encoded
 print 'llave:', key
 print 'mensaje decifrado:', decoded
+
+
+for n in [10000,15000,20000,25000,100000,1000000,10000000]:
+  print '\n'
+  print 'Mensaje',n,'caracteres'
+  message = "".join(random.choice(string.lowercase) for i in range(n))
+  start = time.time()
+  (encoded,key) = encrypt(message)
+  end = time.time()
+  print 'codificacion', end-start
+  start = time.time()
+  decoded = decrypt(encoded,key)
+  end = time.time()
+  print 'decodificacion', end-start
+
+  print "original igual a decodificado?", message==decoded
