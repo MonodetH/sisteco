@@ -39,6 +39,10 @@ def decrypt(message,key):
   message = bytearray.fromhex(message)
   key = bytearray.fromhex(key)
 
+  # en caso de llave invalida, destruir mensaje
+  if not verifyKey(key):
+    random.shuffle(message)
+    
   index = 0
   messageLength = len(message)
   while index < messageLength:
@@ -55,15 +59,30 @@ def decrypt(message,key):
 
     index += blocks
 
-  return message
+  return str(message) 
 
 def generateKey(message):
   # Aplica doble sha para no poder hacer hashing inverso a la llave y obtener el mensaje
   message += str(time.time())
-  sha = hashlib.sha1(message).digest()
-  key = bytearray(hashlib.sha1(sha).digest())
+  sha1 = hashlib.sha1(message).digest()
+  sha2 = hashlib.sha1(sha1).digest()
+
+  # Pasar a bytes
+  sha1 = bytearray(sha1)
+  sha2 = bytearray(sha2)
+  
+  # Intercalar hashs
+  key = bytearray()
+  for a,b in zip(sha1, sha2):
+    key.append(a)
+    key.append(b)
   return key
 
+def verifyKey(key):
+  key = str(key)
+  sha1 = key[::2]
+  sha2 = key[1::2]
+  return sha2 == hashlib.sha1(sha1).digest()
 
 def digestKey(key):
   if type(key) is not bytearray:
@@ -89,7 +108,7 @@ print 'llave:', key
 print 'mensaje decifrado:', decoded
 
 
-for kb in [128,256,512,1024,10240]:
+for kb in [1,2,4,8,16,32,64,128,256,512,1024,10240]:
   print '\n'
   n = kb*1024
   print "Mensaje {0} caracteres ({1} KB)".format(n,kb)
